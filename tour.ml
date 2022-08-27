@@ -76,8 +76,6 @@ let relu (alpha : float) (x : float) : float = todo ()
 
 let rec fact n = if n = 0 then 1 else n * fact (n - 1)
 
-(* todo: list, map, reduce, filter *)
-
 (* We define an empty list using [], and we prepend an element x to a list l
    using `x :: l`. This does not change the original list, but creates a node
    that points to it (recall that we don't have mutation).
