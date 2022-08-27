@@ -1,0 +1,18 @@
+; Build configuration
+
+; Treat warnings as non-fatal
+
+(env
+ (dev
+  (flags
+   (:standard -warn-error -A))))
+
+(library
+ (name tour)
+ (modules tour util)
+ (wrapped false))
+
+(test
+ (name test)
+ (libraries tour alcotest)
+ (modules test))
