@@ -20,7 +20,7 @@ type genre = Rock | Folk | HipHop | Classical | Metal of string | Pop
 val maybe_subgenre : genre -> string option
 val subgenre : genre -> string
 type song = string * album * genre
-val metal_songs : ('a * 'b * genre) list -> ('a * 'b * genre) list
-val songs_by : string -> ('a * album * 'b) list -> ('a * album * 'b) list
+val metal_songs : song list -> song list
+val songs_by : string -> song list -> song list
 val albums_containing_metal_songs_by :
-  string -> ('a * album * genre) list -> album list
+  string -> song list -> album list
