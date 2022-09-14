@@ -21,7 +21,7 @@ let pi = 3.14159
 let e : float = 2.718
 
 (* Define a variable x of type int with value 7 below *)
-let x = todo ();;
+let x = 7 ;;
 
 (* We can create a function like so: *)
 fun x -> x * x
@@ -66,7 +66,7 @@ if x > 0 then x else -1
    type applicable.
 *)
 
-let relu (alpha : float) (x : float) : float = todo ()
+let relu (alpha : float) (x : float) : float = if x < 0. then 0. else alpha *. x
 
 (* We need the `rec` keyword to define recursive functions. It enables the name
    of the function to be used in the definition of the function.
@@ -141,7 +141,24 @@ open List
    Note on the type signature: 'a is a type variable. So, 'a list is a
    polymorphic/generic type (it is equivalent to List<A> in Java).
 *)
-let rec every_other (xs : 'a list) = todo ()
+
+(* NOTE: "function" is a short hand to create a function that does pattern
+   matching on its argument. So, the following are equivalent (but there is no
+   name for the argument x for the first function):
+
+   let f = function
+    | case1 -> ...
+    | case2 -> ...
+
+   
+   let f x = match x with
+    | case1 -> ...
+    | case2 -> ...
+*)
+let rec every_other = function
+  | [] -> []
+  | first :: _ :: rest -> first :: every_other rest
+  | xs -> xs (* this case is guaranteed to be a 1-element list *)
 
 (* Generalize the function above to return every nth element. So, it takes the
    first element, skips the next n-1 elements (if there are <n-1 elements left
@@ -159,7 +176,14 @@ let rec every_other (xs : 'a list) = todo ()
    every_nth 1 xs = xs (* so, every_nth 1 is identity *)
    every_nth 100 [1; 4; 9; 16] = [1]
 *)
-let rec every_nth (n : int) (xs : 'a list) : 'a list = todo ()
+let rec every_nth (n : int) (xs : 'a list) : 'a list =
+  (* helper that drops the first k elements of the given list *)
+  let rec drop k = function
+    | _ :: xs when k > 0 -> drop (k - 1) xs
+    | xs -> xs (* the case for k = 0 or the list is empty *)
+  in match xs with
+  | [] -> []
+  | first :: _ -> first :: every_nth n (drop n xs)
 
 (* You can chain functions using two alternative notations in OCaml. Using
    either, or whether to use them at all is up to you. Their main purpose is to
@@ -234,7 +258,7 @@ let is_prime n =
    functions (map, filter, etc.) and if possible by building a pipeline of
    functions (defining or using small helpers then chaining them together).
 *)
-let every_other_prime xs = todo ()
+let every_other_prime xs = every_other @@ filter is_prime xs
 
 (* The function below computes the sum of absolute values of even numbers in a
    list.
@@ -250,7 +274,10 @@ let every_other_prime xs = todo ()
    There is already the `abs` function in the standard library, you can use it
    to calculate the absolute value of an integer.
 *)
-let sum_abs_even xs = todo ()
+let sum_abs_even xs =
+  let sum = fold_left (+) 0
+  and is_even x = x mod 2 = 0
+  in sum @@ map abs @@ filter is_even xs
 
 (* We can define new types using `type` keyword. The following defines a new
    record type (similar to a struct/class in C/Java/Python) album with fields
@@ -296,7 +323,10 @@ let fmb =
 *)
 let other_kglw_albums_in_2017 : album list =
   [
-    (* todo: fill this list *)
+   { fmb with title = "Murder of the Universe" };
+   { fmb with title = "Sketches of Brunswick East" };
+   { fmb with title = "Polygondwanaland" };
+   { fmb with title = "Gumboot Soup" };
   ]
 
 (* We can also define variants (a type with many alternatives). Variants are
@@ -332,7 +362,9 @@ let maybe_subgenre g =
    song, then it does not have a subgenre, so the function should return the
    string "not metal enough" instead.
  *)
-let subgenre = todo
+let subgenre = function
+  | Metal subgenre -> subgenre
+  | _ -> "not metal enough"
 
 (* Now, we can also define a type for songs. This time, we will use only tuples
    (product types) rather than records.
@@ -354,14 +386,24 @@ type song = string * album * genre
 (* Define a function that returns all metal songs in a list. See the tests for
    examples.
 *)
-let metal_songs songs = todo ()
+let metal_songs =
+  (* a helper that checks if a song is a metal song using pattern matching *)
+  let is_metal = function
+    | (_, _, Metal _) -> true
+    | _ -> false
+  in filter is_metal
 
 (* Define a function that returns all songs by a given artist. See the tests for
    examples. *)
-let songs_by artist songs = todo ()
+let songs_by artist =
+  (* the same idea as metal_songs above *)
+  filter (fun (_, album, _) -> album.artist = artist)
 
 (* Now, let's fuse these two selection functions, and add a transformation.
 
    Define a function that returns the albums of all metal songs by the given artist.
    Repetitions are okay. *)
-let albums_containing_metal_songs_by artist songs = todo ()
+let albums_containing_metal_songs_by artist songs =
+  songs_by artist songs
+  |> metal_songs
+  |> map (fun (_, album, _) -> album)
